@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+
+{% csrf_token %}
+
+    <div class="container">
+        <div class="card">
+            <div class="card-header">
+                Attendance
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <button class="btn btn-primary" type="button" id="sync" onclick="sendFetch('/dashboard/update')">Sync Attendance</button>
+                    <button class="btn btn-primary" type="button" id ="show" onclick="getData('/dashboard/getatt')">Show Attendance</button>
+                  </div>
+            
+                
+                <table class="table">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th scope="col">Roll No</th>
+                            <th scope="col">Name</th>
+                            <th scope="col">Attendance</th>
+                        </tr>
+                    </thead>
+                    <tbody id="t-body">
+                        {% for stud in studs %}
+                        
+                        <tr >
+                            <td>{{stud.roll_no}}</td>
+                            <td>{{stud.name}}</td>
+                            <td id={{stud.roll_no}}>Absent</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <script>
+
+
+        function getCookie(name) {
+            var cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                var cookies = document.cookie.split(';');
+                for (var i = 0; i < cookies.length; i++) {
+                    var cookie = cookies[i].trim();
+                    // Does this cookie string begin with the name we want?
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        
+        
+
+        const sendFetch =(endpoint) =>{
+
+            document.getElementById("sync").innerText ="Loading..."
+            fetch(endpoint ,  {
+                method: "POST",
+                credentials: "same-origin",
+                headers: {
+                "X-CSRFToken": getCookie("csrftoken"),
+                "Accept": "application/json",
+                'Content-Type': 'application/json'
+                }})
+            .then(response => response.json())
+            .then(data => {
+
+                //sucesss
+                document.getElementById("sync").innerText ="Sync Attendence"
+                data.ok ? alert("Attendence updated") : alert("somenting went wrong !!");
+
+            })
+            .catch(e => {
+                //something went wrong
+                document.getElementById("sync").innerText ="Sync Attendance"
+                alert("Camera not connected successfully");
+            });
+        }
+
+
+        const getData =(endpoint) =>{
+
+            document.getElementById("show").innerText ="Loading..."
+            fetch(endpoint , {
+                method: "POST",
+                credentials: "same-origin",
+                headers: {
+                "X-CSRFToken": getCookie("csrftoken"),
+                "Accept": "application/json",
+                'Content-Type': 'application/json'
+                }})
+            .then(response => response.json())
+            .then(response => JSON.parse(response.attendance))
+            .then(data => {
+
+
+                document.getElementById("show").innerText ="Show Attendance";
+
+                console.log(data[0].fields.name);
+                
+                for (let i = 0 ; i < data.length ; i++){
+
+                    document.getElementById(`${data[i].fields.name}`).innerText='Present'
+                }
+
+
+            })
+            .catch(e => {
+                console.log(e)
+                document.getElementById("show").innerText ="Show Attendance";
+                alert("Attendance not Synced Properly");
+            });
+        }
+
+
+        
+    </script>
+
+
+
+{% endblock %}
