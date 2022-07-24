@@ -32,7 +32,7 @@ def runModel():
     # reading camera
 
     path = '/home/aboozuhaib/Documents/miniproject/Face-Recognition-esp32/student_images'
-    url = 'http://192.168.1.47/cam-hi.jpg'
+    url = 'http://192.168.1.39/cam-hi.jpg'
     ##'''cam.bmp / cam-lo.jpg /cam-hi.jpg / cam.mjpeg '''
 
     if 'Attendance.csv' in os.listdir("/home/aboozuhaib/Documents/miniproject/Face-Recognition-esp32"):
@@ -48,13 +48,18 @@ def runModel():
         "/home/aboozuhaib/Documents/miniproject/Face-Recognition-esp32/Attendance.csv")
 
     images = []
+    classNames = []
     rollNumbers = []
     myList = os.listdir(path)
     print(myList)
     for cl in myList:
         curImg = cv2.imread(f'{path}/{cl}')
         images.append(curImg)
-        rollNumbers.append(os.path.splitext(cl)[0])
+        splitName = os.path.splitext(cl)[0]
+        classNames.append(splitName)
+        splitRoll = splitName.split("_")[1]
+        rollNumbers.append(splitRoll)
+    print(classNames)
     print(rollNumbers)
 
     def findEncodings(images):
