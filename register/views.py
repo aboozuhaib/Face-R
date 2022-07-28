@@ -6,6 +6,28 @@ from django.contrib import messages
 
 # Create your views here.
 
+def index(request):
+    return render(request, 'index.html', {'title':'FaceR'})
+
+
+def login(request):
+    if request.method == 'POST':
+        username =  request.POST['username']
+        password =  request.POST['password']
+
+        user = auth.authenticate(username=username, password=password)
+
+        if user is not None:
+            auth.login(request, user)
+            return redirect('/')
+        else:
+            messages.info(request, 'Invalid Credentials')
+            return redirect('FaceR')
+
+    else:
+        return render(request, 'login.html' ,{'title':"Login"})
+
+
 
 def register(request):
 
@@ -34,9 +56,12 @@ def register(request):
         else:
             messages.info(request,"password doesn't match")
             return redirect('register')
-
         return redirect('/')
 
 
     else:
         return render(request, 'register.html' ,{'title':"Register"})
+
+def logout(request):
+    auth.logout(request)
+    return redirect('FaceR')
